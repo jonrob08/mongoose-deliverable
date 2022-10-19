@@ -250,6 +250,18 @@ app.get('/comments/:id', (req, res) => {
         });
 });
 
+app.get('/posts/:id/comments', (req, res) => {
+    Post.findById(req.params.id).populate('comments').exec()
+    .then(post => {
+        console.log('here is the post', post)
+        res.json({ post:post })
+    })
+    .catch(error => { 
+        console.log('error', error);
+        res.json({ message: "Error ocurred, please try again" });
+    });
+});
+
 app.post('/posts/:id/comments', (req, res) => {
     Post.findById(req.params.id)
     .then(post => {
@@ -276,20 +288,19 @@ app.post('/posts/:id/comments', (req, res) => {
     });
 });
 
-app.put('/comments/:header', (req, res) => {
+app.put('/comments/:id', (req, res) => {
     console.log('route is being on PUT')
     Comment.findById(req.params.id)
         .then(foundComment => {
-            console.log('User found', foundPost);
+            console.log('Comment found', foundComment);
             Comment.findByIdAndUpdate(req.params.id,
                 {
                     header: req.body.header ? req.body.header : foundComment.header,
-                    body: req.body.body ? req.body.body : foundComment.body,
-                    date: req.body.date ? req.body.date : foundComment.date
+                    content: req.body.content ? req.body.content : foundComment.content,
                 })
                 .then(comment => {
-                    console.log('User was updated', comment);
-                    res.redirect(`/users/${req.params.header}`)
+                    console.log('Comment was updated', comment);
+                    res.redirect(`/comments/${req.params.id}`)
                 })
                 .catch(error => {
                     console.log('error', error)
